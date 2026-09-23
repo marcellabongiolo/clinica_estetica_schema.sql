@@ -1,0 +1,1 @@
+# clinica_estetica_schema.sql
