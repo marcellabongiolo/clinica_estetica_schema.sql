@@ -1,75 +1,108 @@
-/*
- * Módulo: Sistema de Gestão de Clínica Estética (Medical Cosmetics)
- * Autor: Marcella Bongiolo
- * Descrição: Script DDL/DML para criação do banco de dados, tabelas,
- *            inserção de registros e queries analíticas (Foco: PostgreSQL/MySQL).
- */
+# 🏥 Clínica Estética — Database Schema
 
--- ==========================================
--- 1. ESTRUTURA DO BANCO DE DADOS (DDL)
--- ==========================================
+Projeto de **modelagem relacional em SQL** para uma clínica estética, desenvolvido como exercício de banco de dados.
 
--- Criação da tabela de Pacientes
-CREATE TABLE pacientes (
-    id_paciente INT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    data_nascimento DATE NOT NULL,
-    telefone VARCHAR(20),
-    data_cadastro DATE DEFAULT CURRENT_DATE
-);
+O repositório demonstra a criação de tabelas, relacionamentos por chaves estrangeiras, restrições de integridade, índices, dados de demonstração e uma consulta com múltiplos `JOINs`.
 
--- Criação da tabela de Procedimentos (Ex: Skincare, Limpeza de pele, etc)
-CREATE TABLE procedimentos (
-    id_procedimento INT PRIMARY KEY,
-    nome_procedimento VARCHAR(100) NOT NULL,
-    preco DECIMAL(10, 2) NOT NULL,
-    duracao_minutos INT NOT NULL
-);
+## Objetivos
 
--- Criação da tabela de Agendamentos (Relacionamento entre Paciente e Procedimento)
-CREATE TABLE agendamentos (
-    id_agendamento INT PRIMARY KEY,
-    id_paciente INT,
-    id_procedimento INT,
-    data_agendamento TIMESTAMP NOT NULL,
-    status VARCHAR(20) DEFAULT 'Pendente',
-    FOREIGN KEY (id_paciente) REFERENCES pacientes(id_paciente),
-    FOREIGN KEY (id_procedimento) REFERENCES procedimentos(id_procedimento)
-);
+- Praticar modelagem de banco de dados relacional.
+- Aplicar conceitos de **DDL** e **DML**.
+- Trabalhar com chaves primárias e estrangeiras.
+- Definir restrições de integridade com `NOT NULL` e `CHECK`.
+- Criar índices para colunas usadas nos relacionamentos e consultas.
+- Consultar dados relacionados com `JOIN`.
+- Documentar um pequeno cenário de negócio em SQL.
 
--- ==========================================
--- 2. INSERÇÃO DE DADOS MOCKADOS (DML)
--- ==========================================
+## Modelo de dados
 
-INSERT INTO pacientes (id_paciente, nome, data_nascimento, telefone) VALUES
-(1, 'Ana Clara Silva', '1995-04-12', '11999998888'),
-(2, 'Bruno Santos', '1988-10-25', '11988887777');
+O banco possui três entidades principais:
 
-INSERT INTO procedimentos (id_procedimento, nome_procedimento, preco, duracao_minutos) VALUES
-(1, 'Limpeza de Pele Profunda', 150.00, 60),
-(2, 'Peeling Químico', 250.00, 45),
-(3, 'Revitalização Facial', 180.00, 50);
+- **pacientes** — dados cadastrais dos pacientes.
+- **procedimentos** — serviços oferecidos pela clínica.
+- **agendamentos** — relaciona pacientes e procedimentos em uma data e horário.
 
-INSERT INTO agendamentos (id_agendamento, id_paciente, id_procedimento, data_agendamento, status) VALUES
-(1, 1, 1, '2026-10-05 14:00:00', 'Concluído'),
-(2, 2, 2, '2026-10-06 10:30:00', 'Pendente');
+Relacionamentos:
 
--- ==========================================
--- 3. QUERIES ANALÍTICAS DE NEGÓCIO
--- ==========================================
+```text
+pacientes 1 ─────── N agendamentos N ─────── 1 procedimentos
+```
 
--- Query: Listar todos os agendamentos com os nomes dos pacientes e procedimentos
-SELECT 
-    a.id_agendamento,
-    p.nome AS paciente,
-    pr.nome_procedimento AS procedimento,
-    a.data_agendamento,
-    a.status
-FROM 
-    agendamentos a
-JOIN 
-    pacientes p ON a.id_paciente = p.id_paciente
-JOIN 
-    procedimentos pr ON a.id_procedimento = pr.id_procedimento
-ORDER BY 
-    a.data_agendamento;
+Cada agendamento pertence a um paciente e a um procedimento.
+
+## Estrutura
+
+```text
+clinica_estetica_schema.sql/
+├── .github/
+│   └── workflows/
+│       └── tests.yml
+├── tests/
+│   └── test_schema.py
+├── .gitignore
+├── LICENSE
+├── README.md
+└── clinica_estetica_schema.sql
+```
+
+## Conteúdo do script
+
+O arquivo SQL contém:
+
+1. **DDL**
+   - criação das tabelas;
+   - chaves primárias;
+   - chaves estrangeiras;
+   - restrições de integridade;
+   - índices.
+
+2. **DML**
+   - dados de demonstração para pacientes, procedimentos e agendamentos.
+
+3. **Consulta analítica**
+   - combinação de dados de três tabelas com `JOIN`;
+   - ordenação por data do agendamento.
+
+## Tecnologias
+
+- SQL
+- Modelagem relacional
+- PostgreSQL / MySQL
+- SQLite para os testes automatizados
+- Python `unittest`
+- GitHub Actions
+
+## Como executar
+
+O script principal está em:
+
+```text
+clinica_estetica_schema.sql
+```
+
+Ele pode ser executado em um ambiente SQL compatível, como PostgreSQL ou MySQL.
+
+Para executar os testes localmente:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Os testes utilizam o SQLite disponível na biblioteca padrão do Python para verificar a estrutura e as regras básicas do modelo sem exigir a instalação de um servidor de banco de dados.
+
+## Observação sobre os dados
+
+Os registros inseridos no script são **dados fictícios para demonstração**. O projeto não representa uma base clínica real.
+
+## Próximos passos
+
+- adicionar uma tabela de profissionais;
+- modelar pagamentos e formas de pagamento;
+- registrar histórico de status dos agendamentos;
+- adicionar consultas de faturamento;
+- criar uma camada de acesso via API;
+- evoluir o modelo para um projeto completo de backend.
+
+## Licença
+
+Este projeto está disponível sob a licença MIT.
